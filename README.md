@@ -1,58 +1,42 @@
 
 # Go-Kit Pattern
 
-A brief description of what this project does and who it's for
-
-
-# Go-Kit Pattern
-
-
-
+This is just standar pattern create with go kit command
 
 ## Authors
 
 - [@giriaditya](https://www.github.com/giriaditya)
-
 
 ## Deployment
 
 To deploy this project run
 
 ```bash
-  npm run deploy
+  go build
 ```
-
-
-## Acknowledgements
-
- - [Awesome Readme Templates](https://awesomeopensource.com/project/elangosundar/awesome-README-templates)
- - [Awesome README](https://github.com/matiassingers/awesome-readme)
- - [How to write a Good readme](https://bulldogjob.com/news/449-how-to-write-a-good-readme-for-your-github-project)
-
 
 ## API Reference
 
-#### Get all items
+#### Create books
 
 ```http
-  GET /api/items
-```
-
-| Parameter | Type     | Description                |
-| :-------- | :------- | :------------------------- |
-| `api_key` | `string` | **Required**. Your API key |
-
-#### Get item
-
-```http
-  GET /api/items/${id}
+  POST /create
 ```
 
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
-| `id`      | `string` | **Required**. Id of item to fetch |
+| `title`   | `string` | **Required**. Id of item to fetch |
+| `author`  | `string` | **Required**. Id of item to fetch |
 
-#### add(num1, num2)
+#### Get item
 
-Takes two numbers and returns the sum.
+```http
+  POST /update
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id`      | `int` | **Required**. Id of item to fetch    |
+| `title`   | `string` | **Required**. Id of item to fetch |
+| `author`  | `string` | **Required**. Id of item to fetch |
 
