@@ -17,6 +17,7 @@ import (
 	endpoint1 "github.com/go-kit/kit/endpoint"
 	prometheus "github.com/go-kit/kit/metrics/prometheus"
 	log "github.com/go-kit/log"
+	"github.com/go-redis/redis/v9"
 	lightsteptracergo "github.com/lightstep/lightstep-tracer-go"
 	group "github.com/oklog/oklog/pkg/group"
 	opentracinggo "github.com/opentracing/opentracing-go"
@@ -58,7 +59,7 @@ func Run() {
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 	logger = log.With(logger, "caller", log.DefaultCaller)
 
-	//  Determine which tracer to use. We'll pass the tracer to all the
+	// Determine which tracer to use. We'll pass the tracer to all the
 	// components that use it, as a dependency
 	if *zipkinURL != "" {
 		logger.Log("tracer", "Zipkin", "URL", *zipkinURL)
@@ -90,7 +91,7 @@ func Run() {
 		tracer = opentracinggo.GlobalTracer()
 	}
 
-	svc := service.New(getServiceMiddleware(logger), getDBconn(), getRepository())
+	svc := service.New(getServiceMiddleware(logger), getDBconn(), getRedis(), getRepository())
 	eps := endpoint.New(svc, getEndpointMiddleware(logger))
 	g := createService(eps)
 	initMetricsEndpoint(g)
@@ -162,6 +163,14 @@ func initCancelInterrupt(g *group.Group) {
 	}, func(error) {
 		close(cancelInterrupt)
 	})
+}
+func getRedis() *redis.Client {
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81", // no password set
+		DB:       0,                                  // use default DB
+	})
+	return rdb
 }
 func getDBconn() *gorm.DB {
 	dsn := "root:root@tcp(localhost:3306)/books_master?charset=utf8mb4&parseTime=True&loc=Local"
