@@ -1,6 +1,7 @@
 package service
 
 import (
+	"books/pkg/repository"
 	"context"
 
 	log "github.com/go-kit/log"
@@ -47,4 +48,18 @@ func (l loggingMiddleware) Publish(ctx context.Context, id int) (rs string, err 
 		l.logger.Log("method", "Publish", "id", id, "rs", rs, "err", err)
 	}()
 	return l.next.Publish(ctx, id)
+}
+
+func (l loggingMiddleware) SendEmailBookPublished(ctx context.Context, id int) (rs string, err error) {
+	defer func() {
+		l.logger.Log("method", "SendEmailBookPublished", "id", id, "rs", rs, "err", err)
+	}()
+	return l.next.SendEmailBookPublished(ctx, id)
+}
+
+func (l loggingMiddleware) GetBook(ctx context.Context, id int) (rs repository.Books, err error) {
+	defer func() {
+		l.logger.Log("method", "GetBook", "id", id, "rs", rs, "err", err)
+	}()
+	return l.next.GetBook(ctx, id)
 }

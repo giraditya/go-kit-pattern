@@ -1,6 +1,7 @@
 package endpoint
 
 import (
+	"books/pkg/repository"
 	service "books/pkg/service"
 	"context"
 
@@ -176,4 +177,80 @@ func (e Endpoints) Publish(ctx context.Context, id int) (rs string, err error) {
 		return
 	}
 	return response.(PublishResponse).Rs, response.(PublishResponse).Err
+}
+
+// SendEmailBookPublishedRequest collects the request parameters for the SendEmailBookPublished method.
+type SendEmailBookPublishedRequest struct {
+	Id int `json:"id"`
+}
+
+// SendEmailBookPublishedResponse collects the response parameters for the SendEmailBookPublished method.
+type SendEmailBookPublishedResponse struct {
+	Rs  string `json:"rs"`
+	Err error  `json:"err"`
+}
+
+// MakeSendEmailBookPublishedEndpoint returns an endpoint that invokes SendEmailBookPublished on the service.
+func MakeSendEmailBookPublishedEndpoint(s service.BooksService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(SendEmailBookPublishedRequest)
+		rs, err := s.SendEmailBookPublished(ctx, req.Id)
+		return SendEmailBookPublishedResponse{
+			Err: err,
+			Rs:  rs,
+		}, nil
+	}
+}
+
+// Failed implements Failer.
+func (r SendEmailBookPublishedResponse) Failed() error {
+	return r.Err
+}
+
+// SendEmailBookPublished implements Service. Primarily useful in a client.
+func (e Endpoints) SendEmailBookPublished(ctx context.Context, id int) (rs string, err error) {
+	request := SendEmailBookPublishedRequest{Id: id}
+	response, err := e.SendEmailBookPublishedEndpoint(ctx, request)
+	if err != nil {
+		return
+	}
+	return response.(SendEmailBookPublishedResponse).Rs, response.(SendEmailBookPublishedResponse).Err
+}
+
+// GetBookRequest collects the request parameters for the GetBook method.
+type GetBookRequest struct {
+	Id int `json:"id"`
+}
+
+// GetBookResponse collects the response parameters for the GetBook method.
+type GetBookResponse struct {
+	Rs  repository.Books `json:"rs"`
+	Err error            `json:"err"`
+}
+
+// MakeGetBookEndpoint returns an endpoint that invokes GetBook on the service.
+func MakeGetBookEndpoint(s service.BooksService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(GetBookRequest)
+		rs, err := s.GetBook(ctx, req.Id)
+		return GetBookResponse{
+			Err: err,
+			Rs:  rs,
+		}, nil
+	}
+}
+
+// Failed implements Failer.
+func (r GetBookResponse) Failed() error {
+	return r.Err
+}
+
+// GetBook implements Service. Primarily useful in a client.
+func (e Endpoints) GetBook(ctx context.Context, id int) (rs repository.Books, err error) {
+	request := GetBookRequest{Id: id}
+	response, err := e.GetBookEndpoint(ctx, request)
+	if err != nil {
+		return
+	}
+	return response.(GetBookResponse).Rs, response.(GetBookResponse).Err
 }

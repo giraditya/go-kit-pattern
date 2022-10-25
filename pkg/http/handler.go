@@ -130,3 +130,53 @@ func encodePublishResponse(ctx context.Context, w http.ResponseWriter, response 
 	err = json.NewEncoder(w).Encode(response)
 	return
 }
+
+// makeSendEmailBookPublishedHandler creates the handler logic
+func makeSendEmailBookPublishedHandler(m *http.ServeMux, endpoints endpoint.Endpoints, options []http1.ServerOption) {
+	m.Handle("/send-email-book-published", http1.NewServer(endpoints.SendEmailBookPublishedEndpoint, decodeSendEmailBookPublishedRequest, encodeSendEmailBookPublishedResponse, options...))
+}
+
+// decodeSendEmailBookPublishedRequest is a transport/http.DecodeRequestFunc that decodes a
+// JSON-encoded request from the HTTP request body.
+func decodeSendEmailBookPublishedRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	req := endpoint.SendEmailBookPublishedRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	return req, err
+}
+
+// encodeSendEmailBookPublishedResponse is a transport/http.EncodeResponseFunc that encodes
+// the response as JSON to the response writer
+func encodeSendEmailBookPublishedResponse(ctx context.Context, w http.ResponseWriter, response interface{}) (err error) {
+	if f, ok := response.(endpoint.Failure); ok && f.Failed() != nil {
+		ErrorEncoder(ctx, f.Failed(), w)
+		return nil
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	err = json.NewEncoder(w).Encode(response)
+	return
+}
+
+// makeGetBookHandler creates the handler logic
+func makeGetBookHandler(m *http.ServeMux, endpoints endpoint.Endpoints, options []http1.ServerOption) {
+	m.Handle("/get-book", http1.NewServer(endpoints.GetBookEndpoint, decodeGetBookRequest, encodeGetBookResponse, options...))
+}
+
+// decodeGetBookRequest is a transport/http.DecodeRequestFunc that decodes a
+// JSON-encoded request from the HTTP request body.
+func decodeGetBookRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	req := endpoint.GetBookRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	return req, err
+}
+
+// encodeGetBookResponse is a transport/http.EncodeResponseFunc that encodes
+// the response as JSON to the response writer
+func encodeGetBookResponse(ctx context.Context, w http.ResponseWriter, response interface{}) (err error) {
+	if f, ok := response.(endpoint.Failure); ok && f.Failed() != nil {
+		ErrorEncoder(ctx, f.Failed(), w)
+		return nil
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	err = json.NewEncoder(w).Encode(response)
+	return
+}

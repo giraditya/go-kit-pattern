@@ -4,6 +4,7 @@ import (
 	"books/pkg/repository"
 	"context"
 
+	"github.com/go-redis/redis/v9"
 	"gorm.io/gorm"
 )
 
@@ -14,10 +15,13 @@ type BooksService interface {
 	Update(ctx context.Context, title string, author string) (rs string, err error)
 	Delete(ctx context.Context, id int) (rs string, err error)
 	Publish(ctx context.Context, id int) (rs string, err error)
+	GetBook(ctx context.Context, id int) (rs repository.Books, err error)
+	SendEmailBookPublished(ctx context.Context, id int) (rs string, err error)
 }
 
 type basicBooksService struct {
 	DB              *gorm.DB
+	Redis           *redis.Client
 	BooksRepository repository.BooksRepository
 }
 
@@ -73,18 +77,29 @@ func (b *basicBooksService) Publish(ctx context.Context, id int) (rs string, err
 	rs = "books published"
 	return rs, err
 }
+func (b *basicBooksService) GetBook(ctx context.Context, id int) (rs repository.Books, err error) {
+	// TODO implement the business logic of GetBook
+	rs, err = b.BooksRepository.GetBook(ctx, b.DB, id)
+	return rs, err
+}
+func (b *basicBooksService) SendEmailBookPublished(ctx context.Context, id int) (rs string, err error) {
+	// TODO implement the business logic of SendEmailBookPublished
+
+	return rs, err
+}
 
 // NewBasicBooksService returns a naive, stateless implementation of BooksService.
-func NewBasicBooksService(db *gorm.DB, bookRepository repository.BooksRepository) BooksService {
+func NewBasicBooksService(db *gorm.DB, redis *redis.Client, bookRepository repository.BooksRepository) BooksService {
 	return &basicBooksService{
 		DB:              db,
+		Redis:           redis,
 		BooksRepository: bookRepository,
 	}
 }
 
 // New returns a BooksService with all of the expected middleware wired in.
-func New(middleware []Middleware, db *gorm.DB, bookRepository repository.BooksRepository) BooksService {
-	var svc BooksService = NewBasicBooksService(db, bookRepository)
+func New(middleware []Middleware, db *gorm.DB, redis *redis.Client, bookRepository repository.BooksRepository) BooksService {
+	var svc BooksService = NewBasicBooksService(db, redis, bookRepository)
 	for _, m := range middleware {
 		svc = m(svc)
 	}

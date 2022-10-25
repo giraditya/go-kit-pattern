@@ -10,20 +10,24 @@ import (
 // meant to be used as a helper struct, to collect all of the endpoints into a
 // single parameter.
 type Endpoints struct {
-	CreateEndpoint  endpoint.Endpoint
-	UpdateEndpoint  endpoint.Endpoint
-	DeleteEndpoint  endpoint.Endpoint
-	PublishEndpoint endpoint.Endpoint
+	CreateEndpoint                 endpoint.Endpoint
+	UpdateEndpoint                 endpoint.Endpoint
+	DeleteEndpoint                 endpoint.Endpoint
+	PublishEndpoint                endpoint.Endpoint
+	GetBookEndpoint                endpoint.Endpoint
+	SendEmailBookPublishedEndpoint endpoint.Endpoint
 }
 
 // New returns a Endpoints struct that wraps the provided service, and wires in all of the
 // expected endpoint middlewares
 func New(s service.BooksService, mdw map[string][]endpoint.Middleware) Endpoints {
 	eps := Endpoints{
-		CreateEndpoint:  MakeCreateEndpoint(s),
-		DeleteEndpoint:  MakeDeleteEndpoint(s),
-		PublishEndpoint: MakePublishEndpoint(s),
-		UpdateEndpoint:  MakeUpdateEndpoint(s),
+		CreateEndpoint:                 MakeCreateEndpoint(s),
+		DeleteEndpoint:                 MakeDeleteEndpoint(s),
+		GetBookEndpoint:                MakeGetBookEndpoint(s),
+		PublishEndpoint:                MakePublishEndpoint(s),
+		SendEmailBookPublishedEndpoint: MakeSendEmailBookPublishedEndpoint(s),
+		UpdateEndpoint:                 MakeUpdateEndpoint(s),
 	}
 	for _, m := range mdw["Create"] {
 		eps.CreateEndpoint = m(eps.CreateEndpoint)
@@ -36,6 +40,12 @@ func New(s service.BooksService, mdw map[string][]endpoint.Middleware) Endpoints
 	}
 	for _, m := range mdw["Publish"] {
 		eps.PublishEndpoint = m(eps.PublishEndpoint)
+	}
+	for _, m := range mdw["GetBook"] {
+		eps.GetBookEndpoint = m(eps.GetBookEndpoint)
+	}
+	for _, m := range mdw["SendEmailBookPublished"] {
+		eps.SendEmailBookPublishedEndpoint = m(eps.SendEmailBookPublishedEndpoint)
 	}
 	return eps
 }

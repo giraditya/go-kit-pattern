@@ -15,5 +15,7 @@ func NewHTTPHandler(endpoints endpoint.Endpoints, options map[string][]http.Serv
 	makeUpdateHandler(m, endpoints, options["Update"])
 	makeDeleteHandler(m, endpoints, options["Delete"])
 	makePublishHandler(m, endpoints, options["Publish"])
+	makeGetBookHandler(m, endpoints, options["GetBook"])
+	makeSendEmailBookPublishedHandler(m, endpoints, options["SendEmailBookPublished"])
 	return m
 }
